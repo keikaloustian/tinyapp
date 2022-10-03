@@ -16,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/keikaloustian/tinyapp/issues"
   },
-  "homepage": "https://github.com/keikaloustian/tinyapp#readme"
+  "homepage": "https://github.com/keikaloustian/tinyapp#readme",
+  "dependencies": {
+    "express": "^4.18.1"
+  }
 }
