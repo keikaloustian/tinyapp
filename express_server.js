@@ -18,6 +18,12 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
+app.post('/urls/:id/delete', (req, res) => {
+  const idToDelete = req.params.id;
+  delete urlDatabase[idToDelete];
+  res.redirect('/urls');
+});
+
 app.post('/urls', (req, res) => {
   const newID = generateRandomString(shortIdLength);
   urlDatabase[newID] = req.body.longURL;
