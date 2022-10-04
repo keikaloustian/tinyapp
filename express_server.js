@@ -2,10 +2,10 @@ const express = require("express");
 const app = express();
 const PORT = 8080;
 
-function generateRandomString() {
+function generateRandomString(length) {
   let randNum = Math.random();
   let string = randNum.toString(36);
-  return string.slice(2, 8);
+  return string.slice(2, length + 2);
 };
 
 
