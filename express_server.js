@@ -1,6 +1,7 @@
 const express = require("express");
 const app = express();
 const PORT = 8080;
+const shortIdLength = 6;
 
 function generateRandomString(length) {
   let randNum = Math.random();
@@ -18,8 +19,16 @@ const urlDatabase = {
 };
 
 app.post('/urls', (req, res) => {
-  console.log(req.body);
-  res.send("Ok");
+  const newID = generateRandomString(shortIdLength);
+  urlDatabase[newID] = req.body.longURL;
+
+  const templateVars = { id: newID, longURL: req.body.longURL };
+  res.render('urls_show', templateVars);
+});
+
+app.get('/u/:id', (req, res) => {
+  const longURL = urlDatabase[req.params.id];
+  res.redirect(longURL);
 });
 
 app.get('/urls/new', (req, res) => {
