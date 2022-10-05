@@ -50,17 +50,35 @@ const users = {
 
 /*  /login  &  /logout  */
 
-
 app.post('/logout', (req, res) => {
   res.clearCookie('user_id');
   res.redirect('/urls');
 });
 
-// WILL NEED UPDATING USERNAME COOKIE NO LONGER USED -------------------------------
+
 app.post('/login', (req, res) => {
-  res.cookie('username', req.body.username);
+  const user = checkUserByEmail(req.body.email);
+
+  if (!user) {
+    return res.status(403).send('Invalid email and/or password');
+  }
+  
+  if (req.body.password !== user.password) {
+    return res.status(403).send('Invalid email and/or password');
+  }
+
+  res.cookie('user_id', user.id);
   res.redirect('/urls');
 });
+
+app.get('/login', (req, res) => {
+  const templateVars = {
+    user: users[req.cookies.user_id],
+  };
+  res.render('login', templateVars);
+});
+
+
 
 
 
@@ -92,6 +110,8 @@ app.get('/u/:id', (req, res) => {
 
 
 
+
+
 /*  /urls_new  */
 
 app.get('/urls/new', (req, res) => {
@@ -117,6 +137,8 @@ app.get("/urls.json", (req, res) => {
 
 
 
+
+
 /*  /register  */
 
 app.post('/register', (req, res) => {
@@ -139,13 +161,17 @@ app.post('/register', (req, res) => {
 });
 
 app.get('/register', (req, res) => {
-  res.render('register');
+  const templateVars = {
+    user: users[req.cookies.user_id],
+  };
+  res.render('register', templateVars);
 });
 
 
 
-/*  /urls  */
 
+
+/*  /urls  */
 // Route to create new TinyURL
 app.post('/urls', (req, res) => {
   const newID = generateRandomString(shortIdLength);
@@ -180,6 +206,8 @@ app.get("/hello", (req, res) => {
 app.get("/", (req, res) => {
   res.send("Hello");
 });
+
+
 
 
 
