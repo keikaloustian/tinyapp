@@ -85,6 +85,10 @@ app.get("/urls.json", (req, res) => {
 });
 
 
+app.get('/register', (req, res) => {
+  res.render('register');
+});
+
 app.get("/urls", (req, res) => {
   const templateVars = { 
     urls: urlDatabase, 
