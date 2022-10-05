@@ -55,7 +55,6 @@ app.post('/logout', (req, res) => {
   res.redirect('/urls');
 });
 
-
 app.post('/login', (req, res) => {
   const user = checkUserByEmail(req.body.email);
 
@@ -72,6 +71,11 @@ app.post('/login', (req, res) => {
 });
 
 app.get('/login', (req, res) => {
+
+  if (req.cookies.user_id) {
+    return res.redirect('/urls');
+  }
+
   const templateVars = {
     user: users[req.cookies.user_id],
   };
@@ -102,8 +106,12 @@ app.post('/urls/:id', (req, res) => {
 
 /*  /u/:id  */
 
-
 app.get('/u/:id', (req, res) => {
+
+  if (!(req.params.id in urlDatabase)) {
+    return res.send('Requested TinyURL doesn\'t exist');
+  }
+
   const longURL = urlDatabase[req.params.id];
   res.redirect(longURL);
 });
@@ -115,12 +123,23 @@ app.get('/u/:id', (req, res) => {
 /*  /urls_new  */
 
 app.get('/urls/new', (req, res) => {
+
+  if (!req.cookies.user_id) {
+    return res.redirect('/login');
+  }
+
   const templateVars = {
     user: users[req.cookies.user_id],
   };
 
   res.render('urls_new', templateVars);
 });
+
+
+
+
+
+
 
 app.get('/urls/:id', (req, res) => {
   const templateVars = { 
@@ -161,6 +180,11 @@ app.post('/register', (req, res) => {
 });
 
 app.get('/register', (req, res) => {
+
+  if (req.cookies.user_id) {
+    return res.redirect('/urls');
+  }
+
   const templateVars = {
     user: users[req.cookies.user_id],
   };
@@ -174,6 +198,11 @@ app.get('/register', (req, res) => {
 /*  /urls  */
 // Route to create new TinyURL
 app.post('/urls', (req, res) => {
+  
+  if (!req.cookies.user_id) {
+    return res.send('You must be logged in to use this feature');
+  }
+  
   const newID = generateRandomString(shortIdLength);
   urlDatabase[newID] = req.body.longURL;
   const templateVars = { id: newID, 
@@ -214,5 +243,5 @@ app.get("/", (req, res) => {
 
 
 app.listen(PORT, () => {
-  console.log(`Example app listening on port ${PORT}`);
+  console.log(`App listening on port ${PORT}`);
 });
