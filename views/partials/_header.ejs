@@ -23,9 +23,8 @@
       </div>
     </div>
     
-    <% if (username) { %>
-      <!-- Used &nbsp (non-breaking space) to move user greeting away from log out button -->
-    <h5>Hello, <%= username %>&nbsp&nbsp</h5> 
+    <% if (user) { %>
+    <h5>Logged in as <%= user.email %></h5> 
     <form action="/logout" method="POST">
       <button type="submit" class="btn btn-primary">Log out</button>
     </form>
