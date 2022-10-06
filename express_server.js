@@ -1,6 +1,5 @@
 const express = require("express");
 const morgan = require('morgan');
-const cookieParser = require('cookie-parser');
 const cookieSession = require('cookie-session');
 const bcrypt = require('bcryptjs');
 
@@ -13,7 +12,6 @@ const userIdLength = 4;
 app.set('view engine', 'ejs');
 app.use(express.urlencoded({ extended: true }));
 app.use(morgan("dev"));
-app.use(cookieParser());
 app.use(cookieSession({
   name: 'session',
   keys: ['n456efsa']
@@ -75,7 +73,7 @@ const users = {
 /*  /login  &  /logout  */
 
 app.post('/logout', (req, res) => {
-  res.clearCookie('user_id');
+  req.session = null;
   res.redirect('/urls');
 });
 
@@ -91,19 +89,19 @@ app.post('/login', (req, res) => {
     return res.status(403).send('Invalid email and/or password');
   }
 
-  res.cookie('user_id', user.id);
+  req.session.user_id = (user.id);
   res.redirect('/urls');
 });
 
 
 app.get('/login', (req, res) => {
 
-  if (req.cookies.user_id) {
+  if (req.session.user_id) {
     return res.redirect('/urls');
   }
 
   const templateVars = {
-    user: users[req.cookies.user_id],
+    user: users[req.session.user_id],
   };
   res.render('login', templateVars);
 });
@@ -116,12 +114,12 @@ app.get('/login', (req, res) => {
 
 app.get('/urls/new', (req, res) => {
 
-  if (!req.cookies.user_id) {
+  if (!req.session.user_id) {
     return res.redirect('/login');
   }
 
   const templateVars = {
-    user: users[req.cookies.user_id],
+    user: users[req.session.user_id],
   };
 
   res.render('urls_new', templateVars);
@@ -141,11 +139,11 @@ app.post('/urls/:id/delete', (req, res) => {
     return res.send('Requested TinyURL does not exist\n');
   }
 
-  if (!req.cookies.user_id) {
+  if (!req.session.user_id) {
     return res.send('You must be logged in to delete this TinyURL\n');
   }
 
-  if (req.cookies.user_id !== urlDatabase[req.params.id].userID) {
+  if (req.session.user_id !== urlDatabase[req.params.id].userID) {
     return res.send('You are not the owner of this TinyURL\n');
   }
 
@@ -162,11 +160,11 @@ app.post('/urls/:id', (req, res) => {
     return res.send('Requested TinyURL does not exist\n');
   }
 
-  if (!req.cookies.user_id) {
+  if (!req.session.user_id) {
     return res.send('You must be logged in to edit this TinyURL\n');
   }
 
-  if (req.cookies.user_id !== urlDatabase[req.params.id].userID) {
+  if (req.session.user_id !== urlDatabase[req.params.id].userID) {
     return res.send('You are not the owner of this TinyURL\n');
   }
 
@@ -181,7 +179,7 @@ app.get('/urls/:id', (req, res) => {
     id: req.params.id,
     urlOwner: urlDatabase[req.params.id].userID,
     longURL: urlDatabase[req.params.id].longURL,
-    user: users[req.cookies.user_id],
+    user: users[req.session.user_id],
   };
 
   res.render('urls_show', templateVars);
@@ -238,18 +236,18 @@ app.post('/register', (req, res) => {
     password: hashedPassword,
   };
 
-  res.cookie('user_id', newId);
+  req.session.user_id = (newId);
   res.redirect('/urls');
 });
 
 app.get('/register', (req, res) => {
 
-  if (req.cookies.user_id) {
+  if (req.session.user_id) {
     return res.redirect('/urls');
   }
 
   const templateVars = {
-    user: users[req.cookies.user_id],
+    user: users[req.session.user_id],
   };
   res.render('register', templateVars);
 });
@@ -262,7 +260,7 @@ app.get('/register', (req, res) => {
 // Route for create new button
 app.post('/urls', (req, res) => {
   
-  if (!req.cookies.user_id) {
+  if (!req.session.user_id) {
     return res.send('You must be logged in to create a TinyURL\n');
   }
   
@@ -270,14 +268,14 @@ app.post('/urls', (req, res) => {
 
   urlDatabase[newID] = {
     longURL: req.body.longURL,
-    userID: req.cookies.user_id,
+    userID: req.session.user_id,
   };
 
   const templateVars = {
     id: newID,
-    urlOwner: req.cookies.user_id,
+    urlOwner: req.session.user_id,
     longURL: req.body.longURL,
-    user: users[req.cookies.user_id],
+    user: users[req.session.user_id],
   };
   res.render('urls_show', templateVars);
 });
@@ -285,11 +283,11 @@ app.post('/urls', (req, res) => {
 
 app.get("/urls", (req, res) => {
 
-  const filteredUrlDb = urlsForUser(req.cookies.user_id);
+  const filteredUrlDb = urlsForUser(req.session.user_id);
 
   const templateVars = {
     urls: filteredUrlDb,
-    user: users[req.cookies.user_id],
+    user: users[req.session.user_id],
   };
   res.render("urls_index", templateVars);
 });
