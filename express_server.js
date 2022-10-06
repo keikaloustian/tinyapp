@@ -1,11 +1,24 @@
 const express = require("express");
 const morgan = require('morgan');
 const cookieParser = require('cookie-parser');
+const cookieSession = require('cookie-session');
 const bcrypt = require('bcryptjs');
+
 const app = express();
 const PORT = 8080;
 const shortIdLength = 6;
 const userIdLength = 4;
+
+
+app.set('view engine', 'ejs');
+app.use(express.urlencoded({ extended: true }));
+app.use(morgan("dev"));
+app.use(cookieParser());
+app.use(cookieSession({
+  name: 'session',
+  keys: ['n456efsa']
+}))
+
 
 const generateRandomString = (length) => {
   let randNum = Math.random();
@@ -33,11 +46,6 @@ const urlsForUser = (id) => {
 
   return output;
 };
-
-app.set('view engine', 'ejs');
-app.use(express.urlencoded({ extended: true }));
-app.use(morgan("dev"));
-app.use(cookieParser());
 
 
 const urlDatabase = {
