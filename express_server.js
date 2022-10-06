@@ -2,10 +2,11 @@ const express = require("express");
 const morgan = require('morgan');
 const cookieSession = require('cookie-session');
 const bcrypt = require('bcryptjs');
+const getUserByEmail = require('./helpers');
 
 const app = express();
 const PORT = 8080;
-const shortIdLength = 6;
+const urlIdLength = 6;
 const userIdLength = 4;
 
 
@@ -24,16 +25,7 @@ const generateRandomString = (length) => {
   return string.slice(2, length + 2);
 };
 
-const checkUserByEmail = (email) => {
-  for (let user in users) {
-    if (email === users[user].email) {
-      return users[user];
-    }
-  }
-  return null;
-};
-
-const urlsForUser = (id) => {
+const filterUrlsBy = (id) => {
   const output = {};
   
   for (let url in urlDatabase) {
@@ -63,7 +55,7 @@ const users = {
   asd123: {
     id: "asd123",
     email: "c@rud.ca",
-    password: bcrypt.hashSync("crud"),
+    password: bcrypt.hashSync("1234"),
   },
 };
  
@@ -79,7 +71,7 @@ app.post('/logout', (req, res) => {
 
 
 app.post('/login', (req, res) => {
-  const user = checkUserByEmail(req.body.email);
+  const user = getUserByEmail(req.body.email, users);
 
   if (!user) {
     return res.status(403).send('Invalid email and/or password');
@@ -223,7 +215,7 @@ app.post('/register', (req, res) => {
     return res.status(400).send('Please provide a valid email and password');
   }
   
-  if (checkUserByEmail(req.body.email))  {
+  if (getUserByEmail(req.body.email, users))  {
     return res.status(400).send('Email already in use');
   }
 
@@ -264,7 +256,7 @@ app.post('/urls', (req, res) => {
     return res.send('You must be logged in to create a TinyURL\n');
   }
   
-  const newID = generateRandomString(shortIdLength);
+  const newID = generateRandomString(urlIdLength);
 
   urlDatabase[newID] = {
     longURL: req.body.longURL,
@@ -283,7 +275,7 @@ app.post('/urls', (req, res) => {
 
 app.get("/urls", (req, res) => {
 
-  const filteredUrlDb = urlsForUser(req.session.user_id);
+  const filteredUrlDb = filterUrlsBy(req.session.user_id);
 
   const templateVars = {
     urls: filteredUrlDb,
