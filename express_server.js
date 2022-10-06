@@ -1,6 +1,7 @@
 const express = require("express");
 const morgan = require('morgan');
 const cookieParser = require('cookie-parser');
+const bcrypt = require('bcryptjs');
 const app = express();
 const PORT = 8080;
 const shortIdLength = 6;
@@ -42,7 +43,7 @@ app.use(cookieParser());
 const urlDatabase = {
   "b2xVn2": {
     longURL: "http://www.lighthouselabs.ca",
-    userID: "qwe123",
+    userID: "asd123",
   },
   "9sm5xK": {
     longURL: "https://www.google.ca",
@@ -50,16 +51,13 @@ const urlDatabase = {
   },
 };
 
+
+// Test user for development; still contains plain text password
 const users = {
-  qwe123: {
-    id: "qwe123",
-    email: "v@rad.ca",
-    password: "vrad",
-  },
   asd123: {
     id: "asd123",
     email: "c@rud.ca",
-    password: "crud",
+    password: bcrypt.hashSync("crud"),
   },
 };
  
@@ -81,7 +79,7 @@ app.post('/login', (req, res) => {
     return res.status(403).send('Invalid email and/or password');
   }
   
-  if (req.body.password !== user.password) {
+  if (!bcrypt.compareSync(req.body.password, user.password)) {
     return res.status(403).send('Invalid email and/or password');
   }
 
@@ -141,7 +139,7 @@ app.post('/urls/:id/delete', (req, res) => {
 
   if (req.cookies.user_id !== urlDatabase[req.params.id].userID) {
     return res.send('You are not the owner of this TinyURL\n');
-  };
+  }
 
   const idToDelete = req.params.id;
   delete urlDatabase[idToDelete];
@@ -162,7 +160,7 @@ app.post('/urls/:id', (req, res) => {
 
   if (req.cookies.user_id !== urlDatabase[req.params.id].userID) {
     return res.send('You are not the owner of this TinyURL\n');
-  };
+  }
 
   urlDatabase[req.params.id].longURL = req.body.newLongURL;
   res.redirect('/urls');
@@ -223,12 +221,15 @@ app.post('/register', (req, res) => {
     return res.status(400).send('Email already in use');
   }
 
+  const hashedPassword = bcrypt.hashSync(req.body.password, 10);
+
   const newId = generateRandomString(userIdLength);
   users[newId] = {
     id: newId,
     email: req.body.email,
-    password: req.body.password,
+    password: hashedPassword,
   };
+
   res.cookie('user_id', newId);
   res.redirect('/urls');
 });
