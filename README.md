@@ -7,7 +7,7 @@ In addition to performing all CRUD operations, users can create accounts to keep
 
 ## Final Product
 
-!["screenshot description"](#)
+!["screenshot description"](https://github.com/keikaloustian/tinyapp/blob/master/docs/urls_index.png?raw=true)
 !["screenshot description"](#)
 
 ## Dependencies
