@@ -7,8 +7,9 @@ In addition to performing all CRUD operations, users can create accounts to keep
 
 ## Final Product
 
-!["screenshot description"](https://github.com/keikaloustian/tinyapp/blob/master/docs/urls_index.png?raw=true)
-!["screenshot description"](#)
+!["Screenshot of main URLs page"](https://github.com/keikaloustian/tinyapp/blob/master/docs/urls_index.png?raw=true)
+!["Screenshot of main URLs page when not logged in"](https://github.com/keikaloustian/tinyapp/blob/master/docs/not_logged_index.png?raw=true)
+!["Screenshot of account registration page"](https://github.com/keikaloustian/tinyapp/blob/master/docs/registration_page.png?raw=true)
 
 ## Dependencies
 
