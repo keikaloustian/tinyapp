@@ -2,7 +2,8 @@ const express = require("express");
 const morgan = require('morgan');
 const cookieSession = require('cookie-session');
 const bcrypt = require('bcryptjs');
-const getUserByEmail = require('./helpers');
+const { getUserByEmail, generateRandomString, filterUrlsBy } = require('./helpers');
+
 
 const app = express();
 const PORT = 8080;
@@ -16,25 +17,16 @@ app.use(morgan("dev"));
 app.use(cookieSession({
   name: 'session',
   keys: ['n456efsa']
-}))
+}));
 
 
-const generateRandomString = (length) => {
-  let randNum = Math.random();
-  let string = randNum.toString(36);
-  return string.slice(2, length + 2);
-};
-
-const filterUrlsBy = (id) => {
-  const output = {};
-  
-  for (let url in urlDatabase) {
-    if (id === urlDatabase[url].userID) {
-      output[url] = urlDatabase[url];
-    }
-  }
-
-  return output;
+// Test user for development purposes (still contains plain text password)
+const users = {
+  asd123: {
+    id: "asd123",
+    email: "c@rud.ca",
+    password: bcrypt.hashSync("1234"),
+  },
 };
 
 
@@ -50,16 +42,6 @@ const urlDatabase = {
 };
 
 
-// Test user for development; still contains plain text password
-const users = {
-  asd123: {
-    id: "asd123",
-    email: "c@rud.ca",
-    password: bcrypt.hashSync("1234"),
-  },
-};
- 
-
 
 
 /*  /login  &  /logout  */
@@ -68,7 +50,6 @@ app.post('/logout', (req, res) => {
   req.session = null;
   res.redirect('/urls');
 });
-
 
 app.post('/login', (req, res) => {
   const user = getUserByEmail(req.body.email, users);
@@ -85,7 +66,6 @@ app.post('/login', (req, res) => {
   res.redirect('/urls');
 });
 
-
 app.get('/login', (req, res) => {
 
   if (req.session.user_id) {
@@ -95,9 +75,9 @@ app.get('/login', (req, res) => {
   const templateVars = {
     user: users[req.session.user_id],
   };
+  
   res.render('login', templateVars);
 });
-
 
 
 
@@ -120,10 +100,7 @@ app.get('/urls/new', (req, res) => {
 
 
 
-
-
 /*  /urls/:id  */
-
 
 app.post('/urls/:id/delete', (req, res) => {
 
@@ -144,8 +121,6 @@ app.post('/urls/:id/delete', (req, res) => {
   res.redirect('/urls');
 });
 
-
-// Route to edit existing TinyURL
 app.post('/urls/:id', (req, res) => {
 
   if (!urlDatabase[req.params.id]) {
@@ -164,9 +139,12 @@ app.post('/urls/:id', (req, res) => {
   res.redirect('/urls');
 });
 
-
 app.get('/urls/:id', (req, res) => {
   
+  if (!(req.params.id in urlDatabase)) {
+    return res.send('Requested TinyURL does not exist');
+  }
+
   const templateVars = {
     id: req.params.id,
     urlOwner: urlDatabase[req.params.id].userID,
@@ -176,8 +154,6 @@ app.get('/urls/:id', (req, res) => {
 
   res.render('urls_show', templateVars);
 });
-
-
 
 
 
@@ -197,7 +173,6 @@ app.get('/u/:id', (req, res) => {
 
 
 
-
 /*  /urls.json   */
 
 app.get("/urls.json", (req, res) => {
@@ -207,10 +182,10 @@ app.get("/urls.json", (req, res) => {
 
 
 
-
 /*  /register  */
 
 app.post('/register', (req, res) => {
+  
   if (!req.body.email || !req.body.password) {
     return res.status(400).send('Please provide a valid email and password');
   }
@@ -222,6 +197,7 @@ app.post('/register', (req, res) => {
   const hashedPassword = bcrypt.hashSync(req.body.password, 10);
 
   const newId = generateRandomString(userIdLength);
+  
   users[newId] = {
     id: newId,
     email: req.body.email,
@@ -241,15 +217,15 @@ app.get('/register', (req, res) => {
   const templateVars = {
     user: users[req.session.user_id],
   };
+
   res.render('register', templateVars);
 });
 
 
 
 
-
 /*  /urls  */
-// Route for create new button
+
 app.post('/urls', (req, res) => {
   
   if (!req.session.user_id) {
@@ -269,39 +245,35 @@ app.post('/urls', (req, res) => {
     longURL: req.body.longURL,
     user: users[req.session.user_id],
   };
+
   res.render('urls_show', templateVars);
 });
 
-
 app.get("/urls", (req, res) => {
 
-  const filteredUrlDb = filterUrlsBy(req.session.user_id);
+  const filteredUrlDb = filterUrlsBy(req.session.user_id, urlDatabase);
 
   const templateVars = {
     urls: filteredUrlDb,
     user: users[req.session.user_id],
   };
+
   res.render("urls_index", templateVars);
 });
 
 
 
 
-
-
-
-/*  /hello  */
-
-app.get("/hello", (req, res) => {
-  res.send("<html><body>Hello <b>World</b></body></html>\n");
-});
+/*  /  */
 
 app.get("/", (req, res) => {
-  res.send("Hello");
+
+  if (req.session.user_id) {
+    return res.redirect('/urls');
+  }
+
+  res.redirect('/login');
 });
-
-
-
 
 
 

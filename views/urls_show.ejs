@@ -19,35 +19,42 @@
     <% if (!user) { %>
       
       <br>
-      <span>You must be logged in to see the TinyURL. </span>
+      <span>You must be logged in to see this TinyURL. </span>
+      <br>
       <a href="/login">Log in</a>
       <span> or </span>
       <a href="/register">Register</a>
+      <span>.</span>
     
     <% } else if (user.id !== urlOwner) { %>
+
       <br>
 
       <span>You are not the owner of this TinyURL. </span>
       <span>Return to </span>
       <a href="/urls">My URLs</a>
+      <span>.</span>
     
     <% } else { %>
-    <div class="card text-center">
-      <div class="card-header"></div>
-      <div class="card-body">
-        <h5 class="card-title">TinyURL for: <%= longURL %></h5>
-        <p class="card-text">
-          Short URL ID: <a href="/u/<%= id %>"><%= id %></a>
-        </p>
-        
-        <form action="/urls/<%= id %>" method="POST">
-          <input type="text" name="newLongURL" placeholder="New URL">
-          <button type="submit" class="btn btn-primary">Update</button>
-        </form>
+      
+      <div class="card text-center">
+        <div class="card-header"></div>
+        <div class="card-body">
+          <h5 class="card-title">TinyURL for: <%= longURL %></h5>
+          <p class="card-text">
+            Short URL: <a href="/u/<%= id %>"><%= id %></a>
+          </p>
+          
+          <form action="/urls/<%= id %>" method="POST">
+            <label for="newLongURL">Change target URL: </label>
+            <input type="text" name="newLongURL" id="newLongURL" placeholder="http://">
+            <button type="submit" class="btn btn-primary">Update</button>
+          </form>
 
+        </div>
+        <div class="card-footer text-muted"></div>
       </div>
-      <div class="card-footer text-muted"></div>
-    </div>
+
     <% } %>
 
     <!-- Bootstrap JS -->

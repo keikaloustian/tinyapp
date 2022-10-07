@@ -1,5 +1,5 @@
 const { assert } = require('chai');
-const { getUserByEmail } = require('../helpers');
+const { getUserByEmail, generateRandomString, filterUrlsBy } = require('../helpers');
 
 const testUsers = {
   "userRandomID": {
@@ -13,6 +13,18 @@ const testUsers = {
     password: "dishwasher-funk"
   }
 };
+
+const urlDatabase = {
+  "b2xVn2": {
+    longURL: "http://www.lighthouselabs.ca",
+    userID: "asd123",
+  },
+  "9sm5xK": {
+    longURL: "https://www.google.ca",
+    userID: "qwe456",
+  },
+};
+
 
 describe('getUserByEmail', function() {
   
@@ -35,3 +47,29 @@ describe('getUserByEmail', function() {
   })
 
 });
+
+describe('generateRandomString', function() {
+  
+  it('should return a random string of correct length', function() {
+    const expectedLength = 8;
+    const length = generateRandomString(8).length;
+    assert.strictEqual(length, expectedLength);
+  });
+
+});
+
+describe('filterUrlsBy', function() {
+  
+  it('should return only url objects that match the user id', function() {
+    const expectedUrl = {
+      "b2xVn2": {
+        longURL: "http://www.lighthouselabs.ca",
+        userID: "asd123",
+      }
+    };
+    const url = filterUrlsBy('asd123', urlDatabase);
+    assert.deepEqual(url, expectedUrl);
+  });
+
+});
+

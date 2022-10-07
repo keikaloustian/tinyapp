@@ -7,5 +7,21 @@ const getUserByEmail = (email, database) => {
   return null;
 };
 
+const generateRandomString = (length) => {
+  let randNum = Math.random();
+  let string = randNum.toString(36);
+  return string.slice(2, length + 2);
+};
 
-module.exports = { getUserByEmail };
+const filterUrlsBy = (id, database) => {
+  const output = {};
+  for (let url in database) {
+    if (id === database[url].userID) {
+      output[url] = database[url];
+    }
+  }
+  return output;
+};
+
+
+module.exports = { getUserByEmail, generateRandomString, filterUrlsBy };
