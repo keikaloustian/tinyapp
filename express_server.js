@@ -105,15 +105,15 @@ app.get('/urls/new', (req, res) => {
 app.post('/urls/:id/delete', (req, res) => {
 
   if (!urlDatabase[req.params.id]) {
-    return res.send('Requested TinyURL does not exist\n');
+    return res.send('Requested TeenyURL does not exist\n');
   }
 
   if (!req.session.user_id) {
-    return res.send('You must be logged in to delete this TinyURL\n');
+    return res.send('You must be logged in to delete this TeenyURL\n');
   }
 
   if (req.session.user_id !== urlDatabase[req.params.id].userID) {
-    return res.send('You are not the owner of this TinyURL\n');
+    return res.send('You are not the owner of this TeenyURL\n');
   }
 
   const idToDelete = req.params.id;
@@ -124,15 +124,15 @@ app.post('/urls/:id/delete', (req, res) => {
 app.post('/urls/:id', (req, res) => {
 
   if (!urlDatabase[req.params.id]) {
-    return res.send('Requested TinyURL does not exist\n');
+    return res.send('Requested TeenyURL does not exist\n');
   }
 
   if (!req.session.user_id) {
-    return res.send('You must be logged in to edit this TinyURL\n');
+    return res.send('You must be logged in to edit this TeenyURL\n');
   }
 
   if (req.session.user_id !== urlDatabase[req.params.id].userID) {
-    return res.send('You are not the owner of this TinyURL\n');
+    return res.send('You are not the owner of this TeenyURL\n');
   }
 
   urlDatabase[req.params.id].longURL = req.body.newLongURL;
@@ -142,7 +142,7 @@ app.post('/urls/:id', (req, res) => {
 app.get('/urls/:id', (req, res) => {
   
   if (!(req.params.id in urlDatabase)) {
-    return res.send('Requested TinyURL does not exist');
+    return res.send('Requested TeenyURL does not exist');
   }
 
   const templateVars = {
@@ -163,7 +163,7 @@ app.get('/urls/:id', (req, res) => {
 app.get('/u/:id', (req, res) => {
 
   if (!(req.params.id in urlDatabase)) {
-    return res.send('Requested TinyURL does not exist');
+    return res.send('Requested TeenyURL does not exist');
   }
 
   const longURL = urlDatabase[req.params.id].longURL;
@@ -229,7 +229,7 @@ app.get('/register', (req, res) => {
 app.post('/urls', (req, res) => {
   
   if (!req.session.user_id) {
-    return res.send('You must be logged in to create a TinyURL\n');
+    return res.send('You must be logged in to create a TeenyURL\n');
   }
   
   const newID = generateRandomString(urlIdLength);

@@ -71,5 +71,11 @@ describe('filterUrlsBy', function() {
     assert.deepEqual(url, expectedUrl);
   });
 
+  it('should return an empty object if no urls match the user id', function() {
+    const expectedUrl = {};
+    const url = filterUrlsBy('asd12', urlDatabase);
+    assert.deepEqual(url, expectedUrl);
+  });
+
 });
 
