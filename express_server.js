@@ -3,7 +3,7 @@ const morgan = require('morgan');
 const cookieSession = require('cookie-session');
 const bcrypt = require('bcryptjs');
 const { getUserByEmail, generateRandomString, filterUrlsBy } = require('./helpers');
-
+const methodOverride = require('method-override');
 
 const app = express();
 const PORT = 8080;
@@ -18,6 +18,7 @@ app.use(cookieSession({
   name: 'session',
   keys: ['n456efsa']
 }));
+app.use(methodOverride('_method'));
 
 
 // Test user for development purposes (still contains plain text password)
@@ -102,7 +103,7 @@ app.get('/urls/new', (req, res) => {
 
 /*  /urls/:id  */
 
-app.post('/urls/:id/delete', (req, res) => {
+app.delete('/urls/:id', (req, res) => {
 
   if (!urlDatabase[req.params.id]) {
     return res.send('Requested TeenyURL does not exist\n');
@@ -121,7 +122,7 @@ app.post('/urls/:id/delete', (req, res) => {
   res.redirect('/urls');
 });
 
-app.post('/urls/:id', (req, res) => {
+app.put('/urls/:id', (req, res) => {
 
   if (!urlDatabase[req.params.id]) {
     return res.send('Requested TeenyURL does not exist\n');

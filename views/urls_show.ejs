@@ -45,7 +45,7 @@
             Short URL: <a href="/u/<%= id %>"><%= id %></a>
           </p>
           
-          <form action="/urls/<%= id %>" method="POST">
+          <form action="/urls/<%= id %>?_method=PUT" method="POST">
             <label for="newLongURL">Change target URL: </label>
             <input type="text" name="newLongURL" id="newLongURL" placeholder="http://">
             <button type="submit" class="btn btn-primary">Update</button>
